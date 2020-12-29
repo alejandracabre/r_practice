@@ -40,27 +40,32 @@ head(human_surveys_renamed)
 names(human_surveys_renamed)
 str(human_surveys_renamed)
 
+# Filter out data (based on years for example)
 
-# Find common key 
+
+
+
+## Enrich data
+
+# Find common key # key data set 1  (year, country_text_id) # key data set 2  (id_200, id_103)
 names(v_dem_clean)
 str(v_dem_clean)
 head(v_dem_clean$year)
 head(v_dem_clean$country_text_id)
 v_dem_clean %>% group_by(v_dem_clean$country_text_id) %>% summarise(count = n()) ??
-
-# key data set 1  (year, country_text_id)
+  
 names(human_surveys_renamed)
 str(human_surveys_renamed)
 head(human_surveys$id_101)
 head(human_surveys$id_103)
 head(human_surveys$id_200)
 
-
 # Find unique values por variables
 unique(human_surveys$id_102)
 unique(v_dem$country_text_id)
 
-# Enrich data
+## Join
+
 joined_data <- left_join(v_dem_clean, human_surveys_renamed, 
                            by = c("country_text_id" = "country_text_id_new", "year" = "year_new"))
 head(v_dem_clean)
@@ -74,7 +79,7 @@ human_surveys_renamed %>%
   head()
 
 
-# QA need to validate the join
+# QA need to validate the join, should return 0 values left after the join
 joined_data <- left_join(human_surveys_renamed, v_dem_clean, 
                          by = c("country_text_id_new" = "country_text_id", "year_new" = "year"))
 names(joined_data_test)
@@ -82,10 +87,14 @@ str(joined_data_test)
 joined_data_test %>%
   filter(is.na(country_name_new)) %>% # where condition
   head()
-joined_data_test %>% group_by(country_text_id) %>% summarise(count = n())
+
+## modify columns types (if required)
+joined_data$year_numeric <- as.numeric(practice_r$year)
+summary(joined_data$year_numeric)
 
 
 ## 4- Explore dataset
+
 
 # Basic statistics
 names(joined_data)
@@ -99,11 +108,10 @@ summary(joined_data$v2x_polyarchy)
 
 # frequency 
 
-# modify columns types
-joined_data$year_numeric <- as.numeric(practice_r$year)
-summary(joined_data$year_numeric)
+joined_data_test %>% group_by(country_text_id) %>% summarise(count = n())
 
-# Recode and create new variables
+
+# Recode and create new variables (if required)
 
 
 
