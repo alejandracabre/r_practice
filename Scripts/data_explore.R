@@ -148,7 +148,8 @@ ggplot(data = enriched_data, mapping = aes(x=joined_data$v2x_polyarchy, y=joined
 ggplot(v_dem_clean)  # if only the dataset is known.
 ggplot(data = v_dem_clean, mapping = aes(x=v_dem_clean$v2x_polyarchy, y=v_dem_clean$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
 
-
+ggplot(data = enriched_data, mapping = aes(x = v2x_polyarchy, y = v2x_libdem)) +
+  geom_boxplot()
 
 ## 5- Regression
 
