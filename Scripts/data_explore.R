@@ -88,20 +88,20 @@ joined_data_test %>% group_by(country_text_id, id_103) %>% summarise(count = n()
 ## 4- Explore dataset
 
 # Basic statistics
-names(cleaned_data)
-str(cleaned_data)
-head(cleaned_data$v2x_libdem)
-tail(cleaned_data$v2x_libdem)
-summary(cleaned_data$v2x_libdem)
-head(cleaned_data$v2x_polyarchy)
-tail(cleaned_data$v2x_polyarchy)
-summary(cleaned_data$v2x_polyarchy)
+names(joined_data)
+str(joined_data)
+head(joined_data$v2x_libdem)
+tail(joined_data$v2x_libdem)
+summary(joined_data$v2x_libdem)
+head(joined_data$v2x_polyarchy)
+tail(joined_data$v2x_polyarchy)
+summary(joined_data$v2x_polyarchy)
 
 # frequency 
 
 # modify columns types
-practice_r$year_numeric <- as.numeric(practice_r$year)
-summary(practice_r$year_numeric)
+joined_data$year_numeric <- as.numeric(practice_r$year)
+summary(joined_data$year_numeric)
 
 # Recode and create new variables
 
@@ -110,8 +110,8 @@ summary(practice_r$year_numeric)
 
 
 # plot
-ggplot(cleaned_data)  # if only the dataset is known.
-ggplot(data = cleaned_data, mapping = aes(x=cleaned_data$v2x_polyarchy, y=cleaned_data$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
+ggplot(joined_data)  # if only the dataset is known.
+ggplot(data = joined_data, mapping = aes(x=joined_data$v2x_polyarchy, y=joined_data$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
 
 
 
