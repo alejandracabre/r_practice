@@ -25,9 +25,9 @@ v_dem_clean_selected <- c("country_name",
                           "year", 
                           "v2x_polyarchy", 
                           "v2x_libdem")
-v_dem_clean <- v_dem[v_dem_clean_selected]
-names(v_dem_clean)
-str(v_dem_clean)
+v_dem_selected <- v_dem[v_dem_clean_selected]
+names(v_dem_selected)
+str(v_dem_selected)
 
 #data set 2
 
@@ -42,8 +42,8 @@ str(human_surveys_renamed)
 
 # Filter out data (based on years for example)
 
-
-
+v_dem_clean <- filter(v_dem_selected, year >= 2000)
+human_surveys_clean <- filter(human_surveys_renamed, year_new >= 2000)
 
 ## Enrich data
 
@@ -54,8 +54,8 @@ head(v_dem_clean$year)
 head(v_dem_clean$country_text_id)
 v_dem_clean %>% group_by(v_dem_clean$country_text_id) %>% summarise(count = n()) ??
   
-names(human_surveys_renamed)
-str(human_surveys_renamed)
+names(human_surveys_clean)
+str(human_surveys_clean)
 head(human_surveys$id_101)
 head(human_surveys$id_103)
 head(human_surveys$id_200)
@@ -66,10 +66,10 @@ unique(v_dem$country_text_id)
 
 ## Join
 
-joined_data <- left_join(v_dem_clean, human_surveys_renamed, 
+joined_data <- left_join(v_dem_clean, human_surveys_clean, 
                            by = c("country_text_id" = "country_text_id_new", "year" = "year_new"))
 head(v_dem_clean)
-head(human_surveys_renamed)
+head(human_surveys_clean)
 names(joined_data)
 str(joined_data)
 
@@ -121,6 +121,8 @@ joined_data_test %>% group_by(country_text_id) %>% summarise(count = n())
 ggplot(joined_data)  # if only the dataset is known.
 ggplot(data = joined_data, mapping = aes(x=joined_data$v2x_polyarchy, y=joined_data$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
 
+ggplot(v_dem_clean)  # if only the dataset is known.
+ggplot(data = v_dem_clean, mapping = aes(x=v_dem_clean$v2x_polyarchy, y=v_dem_clean$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
 
 
 
