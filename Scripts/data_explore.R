@@ -11,7 +11,7 @@ if(!file.exists('data'))
 
 #read data into memory
 v_dem <- readRDS("data/V-Dem-CY-Full+Others-v10.rds")
-indice_satisfaccion <- read.csv("data/HUMAN_Surveys_Country_Year_Data.csv",
+human_surveys <- read.csv("data/HUMAN_Surveys_Country_Year_Data.csv",
                             stringsAsFactors= FALSE)
 
 ## 3- Prepare data set
@@ -31,14 +31,14 @@ str(v_dem_clean)
 
 #data set 2
 
-indice_satisfaccion_renamed <- indice_satisfaccion %>%
+human_surveys_renamed <- human_surveys %>%
   mutate(country_name_new = id_101 ,
          country_text_id_new = id_103 ,
          year_new = id_200) %>% 
   select(-id_101,-id_103, -id_200)
-head(indice_satisfaccion_renamed)
-names(indice_satisfaccion_renamed)
-str(indice_satisfaccion_renamed)
+head(human_surveys_renamed)
+names(human_surveys_renamed)
+str(human_surveys_renamed)
 
 
 # Find common key 
@@ -49,40 +49,40 @@ head(v_dem_clean$country_text_id)
 v_dem_clean %>% group_by(v_dem_clean$country_text_id) %>% summarise(count = n()) ??
 
 # key data set 1  (year, country_text_id)
-names(indice_satisfaccion_clean)
-str(indice_satisfaccion_clean)
-head(indice_satisfaccion_clean$id_101)
-head(indice_satisfaccion_clean$id_103)
-head(indice_satisfaccion_clean$id_200)
+names(human_surveys_renamed)
+str(human_surveys_renamed)
+head(human_surveys$id_101)
+head(human_surveys$id_103)
+head(human_surveys$id_200)
 
 
 # Find unique values por variables
-unique(indice_satisfaccion$id_102)
+unique(human_surveys$id_102)
 unique(v_dem$country_text_id)
 
 # Enrich data
-joined_data <- left_join(v_dem_clean, indice_satisfaccion_renamed, 
+joined_data <- left_join(v_dem_clean, human_surveys_renamed, 
                            by = c("country_text_id" = "country_text_id_new", "year" = "year_new"))
 head(v_dem_clean)
-head(indice_satisfaccion_renamed)
+head(human_surveys_renamed)
 names(joined_data)
 str(joined_data)
 
 # QA test to validate if there is available data
-indice_satisfaccion_renamed %>%
+human_surveys_renamed %>%
   filter(year_new == 1789) %>% # where condition
   head()
 
 
 # QA need to validate the join
-joined_data <- left_join(indice_satisfaccion_renamed, v_dem_clean, 
+joined_data <- left_join(human_surveys_renamed, v_dem_clean, 
                          by = c("country_text_id_new" = "country_text_id", "year_new" = "year"))
 names(joined_data_test)
 str(joined_data_test)
 joined_data_test %>%
   filter(is.na(country_name_new)) %>% # where condition
   head()
-joined_data_test %>% group_by(country_text_id, id_103) %>% summarise(count = n())
+joined_data_test %>% group_by(country_text_id) %>% summarise(count = n())
 
 
 ## 4- Explore dataset
