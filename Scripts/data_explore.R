@@ -16,36 +16,74 @@ indice_satisfaccion <- read.csv("data/HUMAN_Surveys_Country_Year_Data.csv",
 
 ## 3- Prepare data set
 
+## Select required data
+#data set 1
+v_dem_clean_selected <- c("country_name", 
+                          "historical_date", 
+                          "country_text_id", 
+                          "codingstart", 
+                          "year", 
+                          "v2x_polyarchy", 
+                          "v2x_libdem")
+v_dem_clean <- v_dem[v_dem_clean_selected]
+names(v_dem_clean)
+str(v_dem_clean)
+
+#data set 2
+
+indice_satisfaccion_renamed <- indice_satisfaccion %>%
+  mutate(country_name_new = id_101 ,
+         country_text_id_new = id_103 ,
+         year_new = id_200) %>% 
+  select(-id_101,-id_103, -id_200)
+head(indice_satisfaccion_renamed)
+names(indice_satisfaccion_renamed)
+str(indice_satisfaccion_renamed)
+
+
 # Find common key 
-names(v_dem)
-str(v_dem)
-head(v_dem$year)
-head(v_dem$country_text_id)
+names(v_dem_clean)
+str(v_dem_clean)
+head(v_dem_clean$year)
+head(v_dem_clean$country_text_id)
+v_dem_clean %>% group_by(v_dem_clean$country_text_id) %>% summarise(count = n()) ??
+
 # key data set 1  (year, country_text_id)
-names(indice_satisfaccion)
-str(indice_satisfaccion)
-head(indice_satisfaccion$id_101)
-head(indice_satisfaccion$id_103)
-head(indice_satisfaccion$id_200)
+names(indice_satisfaccion_clean)
+str(indice_satisfaccion_clean)
+head(indice_satisfaccion_clean$id_101)
+head(indice_satisfaccion_clean$id_103)
+head(indice_satisfaccion_clean$id_200)
 
 
 # Find unique values por variables
-unique(indice_satisfaccion$id_103)
+unique(indice_satisfaccion$id_102)
 unique(v_dem$country_text_id)
 
 # Enrich data
-joined_data <- left_join(practice_r, indice_satisfaccion, 
-                           by = c("country_text_id" = "id_103", "year" = "id_200"))
-
+joined_data <- left_join(v_dem_clean, indice_satisfaccion_renamed, 
+                           by = c("country_text_id" = "country_text_id_new", "year" = "year_new"))
+head(v_dem_clean)
+head(indice_satisfaccion_renamed)
 names(joined_data)
 str(joined_data)
-# need to validate the join
+
+# QA test to validate if there is available data
+indice_satisfaccion_renamed %>%
+  filter(year_new == 1789) %>% # where condition
+  head()
 
 
-# Select required data
+# QA need to validate the join
+joined_data <- left_join(indice_satisfaccion_renamed, v_dem_clean, 
+                         by = c("country_text_id_new" = "country_text_id", "year_new" = "year"))
+names(joined_data_test)
+str(joined_data_test)
+joined_data_test %>%
+  filter(is.na(country_name_new)) %>% # where condition
+  head()
+joined_data_test %>% group_by(country_text_id, id_103) %>% summarise(count = n())
 
-myvars <- c("country_name", "historical_date", "codingstart", "year", "v2x_polyarchy", "v2x_libdem")
-cleaned_data <- practice_r[myvars]
 
 ## 4- Explore dataset
 
