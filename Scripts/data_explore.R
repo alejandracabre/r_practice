@@ -26,6 +26,7 @@ v_dem_clean_selected <- c("country_name",
                           "v2x_polyarchy", 
                           "v2x_libdem")
 v_dem_selected <- v_dem[v_dem_clean_selected]
+v_dem_selected %>% group_by(country_text_id) %>% summarise(count = n())
 names(v_dem_selected)
 str(v_dem_selected)
 
@@ -36,23 +37,27 @@ human_surveys_renamed <- human_surveys %>%
          country_text_id_new = id_103 ,
          year_new = id_200) %>% 
   select(-id_101,-id_103, -id_200)
+human_surveys_renamed %>% group_by(country_text_id_new) %>% summarise(count = n())
 head(human_surveys_renamed)
 names(human_surveys_renamed)
 str(human_surveys_renamed)
 
 # Filter out data (based on years for example)
 
-v_dem_clean <- filter(v_dem_selected, year >= 2000)
-human_surveys_clean <- filter(human_surveys_renamed, year_new >= 2000)
-
+v_dem_clean <- filter(v_dem_selected, year >= 2000 & country_text_id != "" )
+str(v_dem_clean)
+human_surveys_clean <- filter(human_surveys_renamed, year_new >= 2000 & country_text_id_new != "" )
+human_surveys_clean_null <- filter(human_surveys_renamed,country_text_id_new == "" )
+str(human_surveys_clean_null)
 ## Enrich data
 
 # Find common key # key data set 1  (year, country_text_id) # key data set 2  (id_200, id_103)
 names(v_dem_clean)
 str(v_dem_clean)
+str(v_dem_selected)
 head(v_dem_clean$year)
 head(v_dem_clean$country_text_id)
-v_dem_clean %>% group_by(v_dem_clean$country_text_id) %>% summarise(count = n()) ??
+
   
 names(human_surveys_clean)
 str(human_surveys_clean)
@@ -70,6 +75,9 @@ joined_data <- left_join(v_dem_clean, human_surveys_clean,
                            by = c("country_text_id" = "country_text_id_new", "year" = "year_new"))
 head(v_dem_clean)
 head(human_surveys_clean)
+str(v_dem_clean)
+str(human_surveys_clean)
+joined_data %>% group_by(joined_data$country_text_id) %>% summarise(count = n()) 
 names(joined_data)
 str(joined_data)
 
@@ -109,17 +117,33 @@ summary(joined_data$v2x_polyarchy)
 # frequency 
 
 joined_data_test %>% group_by(country_text_id) %>% summarise(count = n())
-
+joined_data_test %>% filter(is.na(country_text_id)) %>% summarise(count = n()) %>%  head()## there is not null values as NA or NULL
+joined_data_test %>% filter(country_text_id == "") %>% summarise(count = n())  %>%  head() ## this is to check empty values ""
+joined_data_test %>% filter(country_text_id == "") %>%  head(100) ## see the firts values when I have empty values
+joined_data_test %>% filter(country_text_id == "") %>%  tail() ## see the last values when I have empty values
+joined_data_test %>% filter(country_text_id == ".") %>% summarise(count = n())
+joined_data_test %>% filter(country_text_id == ".") %>% head() # this is to check rows with .
+  
+ 
 
 # Recode and create new variables (if required)
 
 
+# create a previous year data variable
+enriched_data <- joined_data %>%
+  group_by(country_text_id) %>%
+  mutate(next_v2x_polyarchy = lead(v2x_polyarchy, order_by=year),
+         before_v2x_polyarchy = lag(v2x_polyarchy, order_by=year))
 
-
+# validate the data with an use case
+enriched_data %>%
+  filter(country_text_id == "MEX") %>% # where condition
+  select(country_name,country_text_id, year, v2x_polyarchy, v2x_libdem, next_v2x_polyarchy, before_v2x_polyarchy)
+  head(20)
 
 # plot
-ggplot(joined_data)  # if only the dataset is known.
-ggplot(data = joined_data, mapping = aes(x=joined_data$v2x_polyarchy, y=joined_data$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
+ggplot(enriched_data)  # if only the dataset is known.
+ggplot(data = enriched_data, mapping = aes(x=joined_data$v2x_polyarchy, y=joined_data$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
 
 ggplot(v_dem_clean)  # if only the dataset is known.
 ggplot(data = v_dem_clean, mapping = aes(x=v_dem_clean$v2x_polyarchy, y=v_dem_clean$v2x_libdem ,  color="v2x_libdem")) + geom_point()+scale_x_log10() + geom_smooth(method="lm")
